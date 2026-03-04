@@ -1,9 +1,0 @@
-{
-	"InstallScripts" : 
-	[
-		"D:/project/system/SPM/implementation/build/cmake_install.cmake",
-		"D:/project/system/SPM/implementation/build/third_party/glfw/cmake_install.cmake",
-		"D:/project/system/SPM/implementation/build/third_party/glfw/src/cmake_install.cmake"
-	],
-	"Parallel" : false
-}

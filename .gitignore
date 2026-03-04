@@ -1,0 +1,25 @@
+# Compilation artifacts
+build/
+*.exe
+*.obj
+*.o
+*.a
+*.lib
+*.dll
+*.pdb
+
+# Logs
+logs/
+*.log
+implementation_log.txt
+process_log.txt
+
+# IDE / System
+.vscode/
+.vs/
+*.swp
+*.DS_Store
+imgui.ini
+
+# Submodules/Third-party (if you want to keep them out of main repo)
+# implementation/third_party/

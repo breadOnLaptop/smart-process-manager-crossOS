@@ -1,3 +1,0 @@
-D:\software\programming\msys2\ucrt64\bin\cmake.exe -E rm -f CMakeFiles\spm.dir/objects.a
-D:\software\programming\msys2\ucrt64\bin\ar.exe qc CMakeFiles\spm.dir/objects.a @CMakeFiles\spm.dir\objects1.rsp
-D:\software\programming\msys2\ucrt64\bin\c++.exe -mwindows -Wl,--whole-archive CMakeFiles\spm.dir/objects.a -Wl,--no-whole-archive -o spm.exe -Wl,--out-implib,libspm.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\spm.dir\linkLibs.rsp
