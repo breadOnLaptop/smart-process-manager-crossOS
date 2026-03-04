@@ -143,17 +143,6 @@ CMakeFiles/spm.dir/src/main.cpp.obj: \
  D:/software/programming/msys2/ucrt64/include/c++/15.2.0/bits/stl_vector.h \
  D:/software/programming/msys2/ucrt64/include/c++/15.2.0/bits/stl_bvector.h \
  D:/software/programming/msys2/ucrt64/include/c++/15.2.0/bits/vector.tcc \
- D:/software/programming/msys2/ucrt64/include/c++/15.2.0/iomanip \
- D:/software/programming/msys2/ucrt64/include/c++/15.2.0/locale \
- D:/software/programming/msys2/ucrt64/include/c++/15.2.0/bits/locale_facets_nonio.h \
- D:/software/programming/msys2/ucrt64/include/c++/15.2.0/ctime \
- D:/software/programming/msys2/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/time_members.h \
- D:/software/programming/msys2/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/messages_members.h \
- D:/software/programming/msys2/ucrt64/include/c++/15.2.0/bits/codecvt.h \
- D:/software/programming/msys2/ucrt64/include/c++/15.2.0/bits/locale_facets_nonio.tcc \
- D:/software/programming/msys2/ucrt64/include/c++/15.2.0/bits/locale_conv.h \
- D:/software/programming/msys2/ucrt64/include/c++/15.2.0/sstream \
- D:/software/programming/msys2/ucrt64/include/c++/15.2.0/bits/sstream.tcc \
  D:/software/programming/msys2/ucrt64/include/c++/15.2.0/algorithm \
  D:/software/programming/msys2/ucrt64/include/c++/15.2.0/bits/stl_algo.h \
  D:/software/programming/msys2/ucrt64/include/c++/15.2.0/bits/algorithmfwd.h \
@@ -162,6 +151,8 @@ CMakeFiles/spm.dir/src/main.cpp.obj: \
  D:/software/programming/msys2/ucrt64/include/c++/15.2.0/bits/stl_tempbuf.h \
  D:/software/programming/msys2/ucrt64/include/c++/15.2.0/limits \
  D:/project/system/SPM/implementation/include/ProcessMonitor.h \
+ D:/software/programming/msys2/ucrt64/include/c++/15.2.0/sstream \
+ D:/software/programming/msys2/ucrt64/include/c++/15.2.0/bits/sstream.tcc \
  D:/software/programming/msys2/ucrt64/include/windows.h \
  D:/software/programming/msys2/ucrt64/include/sdkddkver.h \
  D:/software/programming/msys2/ucrt64/include/excpt.h \
@@ -440,6 +431,7 @@ CMakeFiles/spm.dir/src/main.cpp.obj: \
  D:/software/programming/msys2/ucrt64/include/c++/15.2.0/cstdint \
  D:/software/programming/msys2/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/stdint.h \
  D:/software/programming/msys2/ucrt64/include/stdint.h \
+ D:/software/programming/msys2/ucrt64/include/c++/15.2.0/ctime \
  D:/software/programming/msys2/ucrt64/include/c++/15.2.0/bits/parse_numbers.h \
  D:/software/programming/msys2/ucrt64/include/c++/15.2.0/thread \
  D:/software/programming/msys2/ucrt64/include/c++/15.2.0/bits/std_thread.h \
@@ -449,11 +441,22 @@ CMakeFiles/spm.dir/src/main.cpp.obj: \
  D:/software/programming/msys2/ucrt64/include/c++/15.2.0/bits/this_thread_sleep.h \
  D:/project/system/SPM/implementation/include/Logger.h \
  D:/software/programming/msys2/ucrt64/include/c++/15.2.0/fstream \
+ D:/software/programming/msys2/ucrt64/include/c++/15.2.0/bits/codecvt.h \
  D:/software/programming/msys2/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/basic_file.h \
  D:/software/programming/msys2/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/c++io.h \
  D:/software/programming/msys2/ucrt64/include/c++/15.2.0/bits/fstream.tcc \
  D:/software/programming/msys2/ucrt64/include/c++/15.2.0/mutex \
  D:/software/programming/msys2/ucrt64/include/c++/15.2.0/bits/std_mutex.h \
  D:/software/programming/msys2/ucrt64/include/c++/15.2.0/bits/unique_lock.h \
+ D:/software/programming/msys2/ucrt64/include/c++/15.2.0/iomanip \
+ D:/software/programming/msys2/ucrt64/include/c++/15.2.0/locale \
+ D:/software/programming/msys2/ucrt64/include/c++/15.2.0/bits/locale_facets_nonio.h \
+ D:/software/programming/msys2/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/time_members.h \
+ D:/software/programming/msys2/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/messages_members.h \
+ D:/software/programming/msys2/ucrt64/include/c++/15.2.0/bits/locale_facets_nonio.tcc \
+ D:/software/programming/msys2/ucrt64/include/c++/15.2.0/bits/locale_conv.h \
+ D:/project/system/SPM/implementation/include/Formatter.h \
+ D:/project/system/SPM/implementation/include/ProcessMonitor.h \
  D:/software/programming/msys2/ucrt64/include/direct.h \
- D:/software/programming/msys2/ucrt64/include/io.h
+ D:/software/programming/msys2/ucrt64/include/io.h \
+ D:/project/system/SPM/implementation/include/Formatter.h
