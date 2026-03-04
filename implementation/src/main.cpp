@@ -5,7 +5,6 @@
 #include <chrono>
 #include <algorithm>
 #include <atomic>
-#include <deque>
 #include "../include/ProcessMonitor.h"
 #include "../include/ProcessControl.h"
 #include "../include/Logger.h"
@@ -21,18 +20,21 @@ SystemMetrics g_Metrics;
 atomic<bool> g_Running(true);
 atomic<int> g_RefreshIntervalMs(2000);
 
-// Rolling buffer for graphs
+// Corrected contiguous Rolling Buffer for ImGui
 struct RollingBuffer {
-    deque<float> data;
-    size_t maxSize;
-    RollingBuffer(size_t size) : maxSize(size) {
+    vector<float> data;
+    int maxSize;
+    RollingBuffer(int size) : maxSize(size) {
         data.resize(size, 0.0f);
     }
     void add(float val) {
-        data.push_back(val);
-        if (data.size() > maxSize) data.pop_front();
+        // Shift left and add to end to keep it contiguous for PlotLines
+        for (int i = 0; i < maxSize - 1; i++) {
+            data[i] = data[i + 1];
+        }
+        data[maxSize - 1] = val;
     }
-    const float* getData() { return &data[0]; }
+    const float* getData() const { return data.data(); }
 };
 
 // Background thread for automatic refresh.
@@ -57,6 +59,23 @@ bool isSystemProcess(const string& owner) {
             o.find("root") != string::npos);
 }
 
+// Helper: Draw a Task-Manager-like grid
+void DrawGraphGrid(ImVec2 pos, ImVec2 size) {
+    ImDrawList* drawList = ImGui::GetWindowDrawList();
+    ImU32 gridColor = ImColor(255, 255, 255, 30); // Faint white
+    
+    // Vertical lines
+    for (int i = 0; i <= 10; i++) {
+        float x = pos.x + (size.x / 10.0f) * i;
+        drawList->AddLine(ImVec2(x, pos.y), ImVec2(x, pos.y + size.y), gridColor);
+    }
+    // Horizontal lines
+    for (int i = 0; i <= 5; i++) {
+        float y = pos.y + (size.y / 5.0f) * i;
+        drawList->AddLine(ImVec2(pos.x, y), ImVec2(pos.x + size.x, y), gridColor);
+    }
+}
+
 int main() {
     ImplementationLogger::init("logs/implementation_log.txt");
     ProcessLogger::init("logs/process_log.txt");
@@ -77,15 +96,14 @@ int main() {
     static string selectedOwner = "";
     static int refreshChoice = 2;
 
-    RollingBuffer cpuBuffer(100);
-    RollingBuffer ramBuffer(100);
+    RollingBuffer cpuBuffer(60);
+    RollingBuffer ramBuffer(60);
     float lastMetricUpdate = 0;
 
     // Main loop
     while (!windowManager.shouldClose()) {
         windowManager.startFrame();
 
-        // Update metrics every 1s regardless of process refresh rate
         float currentTime = (float)ImGui::GetTime();
         if (currentTime - lastMetricUpdate >= 1.0f) {
             cpuBuffer.add((float)g_Metrics.getCPUUsage());
@@ -99,27 +117,22 @@ int main() {
 
         if (ImGui::BeginTabBar("MainTabs")) {
             
-            // --- TAB 1: PROCESSES ---
             if (ImGui::BeginTabItem("Processes")) {
                 ImGui::Columns(2, "MainColumns", true);
                 ImGui::SetColumnWidth(0, ImGui::GetIO().DisplaySize.x * 0.75f);
 
-                // LEFT COLUMN
                 ImGui::Text("Smart Process Manager (SPM)");
                 ImGui::SameLine(ImGui::GetColumnWidth(0) - 220);
-                
                 const char* refreshRates[] = { "Paused", "500ms", "1s", "2s", "5s" };
                 int msValues[] = { 0, 500, 1000, 2000, 5000 };
-                
                 ImGui::PushItemWidth(120);
                 if (ImGui::Combo("Refresh", &refreshChoice, refreshRates, IM_ARRAYSIZE(refreshRates))) {
                     g_RefreshIntervalMs.store(msValues[refreshChoice]);
                 }
                 ImGui::PopItemWidth();
-                
                 ImGui::Separator();
                 ImGui::PushItemWidth(-1);
-                ImGui::InputTextWithHint("##Search", "Search processes (e.g. chrome, explorer)...", searchFilter, IM_ARRAYSIZE(searchFilter));
+                ImGui::InputTextWithHint("##Search", "Search processes...", searchFilter, IM_ARRAYSIZE(searchFilter));
                 ImGui::PopItemWidth();
 
                 auto processes = g_Snapshot.getProcesses();
@@ -140,10 +153,8 @@ int main() {
                         string ownerLower = proc.owner;
                         transform(nameLower.begin(), nameLower.end(), nameLower.begin(), ::tolower);
                         transform(ownerLower.begin(), ownerLower.end(), ownerLower.begin(), ::tolower);
-
                         if (!filterStr.empty() && nameLower.find(filterStr) == string::npos && ownerLower.find(filterStr) == string::npos)
                             continue;
-
                         ImGui::TableNextRow();
                         ImGui::TableSetColumnIndex(0);
                         bool isSelected = (selectedPid == proc.pid);
@@ -161,56 +172,51 @@ int main() {
                 }
 
                 ImGui::NextColumn();
-
-                // RIGHT COLUMN
                 ImGui::Text("Actions & Details");
                 ImGui::Separator();
                 if (selectedPid != -1) {
                     ImGui::Text("PID: %d", selectedPid);
                     ImGui::Text("Owner: %s", selectedOwner.c_str());
                     bool isProtected = isSystemProcess(selectedOwner);
-                    if (isProtected) {
-                        ImGui::TextColored(ImVec4(1, 0.4f, 0.4f, 1), "System Protected");
-                        ImGui::BeginDisabled();
-                    }
-                    if (ImGui::Button("Terminate", ImVec2(-FLT_MIN, 40))) {
-                        if (killProcess(selectedPid)) { selectedPid = -1; g_Snapshot.refresh(); }
-                    }
+                    if (isProtected) { ImGui::TextColored(ImVec4(1, 0.4f, 0.4f, 1), "System Protected"); ImGui::BeginDisabled(); }
+                    if (ImGui::Button("Terminate", ImVec2(-FLT_MIN, 40))) { if (killProcess(selectedPid)) { selectedPid = -1; g_Snapshot.refresh(); } }
                     static int priorityLevel = 2;
                     ImGui::Combo("Priority", &priorityLevel, "Idle\0Below Normal\0Normal\0Above Normal\0High\0");
                     if (ImGui::Button("Apply", ImVec2(-FLT_MIN, 30))) { changeProcessPriority(selectedPid, priorityLevel + 1); }
                     if (isProtected) ImGui::EndDisabled();
-                } else {
-                    ImGui::TextDisabled("Select a process...");
-                }
-                
-                ImGui::Columns(1); // Reset columns
+                } else { ImGui::TextDisabled("Select a process..."); }
+                ImGui::Columns(1);
                 ImGui::EndTabItem();
             }
 
-            // --- TAB 2: PERFORMANCE ---
             if (ImGui::BeginTabItem("Performance")) {
                 ImGui::Text("Global System Performance");
                 ImGui::Separator();
 
-                float currentCPU = cpuBuffer.data.back();
-                float currentRAM = ramBuffer.data.back();
-
-                ImGui::Text("CPU Usage: %.1f%%", currentCPU);
-                ImGui::ProgressBar(currentCPU / 100.0f, ImVec2(-FLT_MIN, 30));
-                ImGui::PlotLines("##CPUGraph", cpuBuffer.getData(), (int)cpuBuffer.data.size(), 0, "CPU History (60s)", 0.0f, 100.0f, ImVec2(-FLT_MIN, 200));
+                ImVec2 graphSize = ImVec2(-FLT_MIN, 180);
+                
+                // CPU Graph
+                ImGui::Text("CPU Usage: %.1f%%", cpuBuffer.data.back());
+                ImGui::ProgressBar(cpuBuffer.data.back() / 100.0f, ImVec2(-FLT_MIN, 0));
+                
+                ImVec2 cpuPos = ImGui::GetCursorScreenPos();
+                DrawGraphGrid(cpuPos, graphSize);
+                ImGui::PlotLines("##CPUGraph", cpuBuffer.getData(), cpuBuffer.maxSize, 0, nullptr, 0.0f, 100.0f, graphSize);
 
                 ImGui::Spacing();
                 ImGui::Separator();
                 ImGui::Spacing();
 
-                ImGui::Text("RAM Usage: %.1f%%", currentRAM);
-                ImGui::ProgressBar(currentRAM / 100.0f, ImVec2(-FLT_MIN, 30));
-                ImGui::PlotLines("##RAMGraph", ramBuffer.getData(), (int)ramBuffer.data.size(), 0, "RAM History (60s)", 0.0f, 100.0f, ImVec2(-FLT_MIN, 200));
+                // RAM Graph
+                ImGui::Text("RAM Usage: %.1f%%", ramBuffer.data.back());
+                ImGui::ProgressBar(ramBuffer.data.back() / 100.0f, ImVec2(-FLT_MIN, 0));
+                
+                ImVec2 ramPos = ImGui::GetCursorScreenPos();
+                DrawGraphGrid(ramPos, graphSize);
+                ImGui::PlotLines("##RAMGraph", ramBuffer.getData(), ramBuffer.maxSize, 0, nullptr, 0.0f, 100.0f, graphSize);
 
                 ImGui::EndTabItem();
             }
-
             ImGui::EndTabBar();
         }
 
