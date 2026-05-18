@@ -34,6 +34,8 @@ if(WIN32)
     # Ensure static linking for some runtimes if using MSVC to reduce DLL dependencies
     if(MSVC)
         set_target_properties(spm PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+        # Linker flag to use main() as entry point for WIN32 GUI application
+        set_target_properties(spm PROPERTIES LINK_FLAGS "/ENTRY:mainCRTStartup")
     endif()
 else()
     add_executable(spm ${SOURCES} ${IMGUI_SOURCES})
