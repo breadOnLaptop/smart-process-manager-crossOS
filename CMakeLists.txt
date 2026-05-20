@@ -27,7 +27,14 @@ include_directories(${IMGUI_DIR})
 include_directories(${IMGUI_DIR}/backends)
 include_directories(third_party/glfw/include)
 
-file(GLOB SOURCES "src/*.cpp")
+# Explicitly list source files now that we have more
+set(SOURCES 
+    src/main.cpp 
+    src/WindowManager.cpp
+    src/ProcessMonitor.cpp
+    src/ProcessControl.cpp
+    src/SystemMetrics.cpp
+)
 
 if(WIN32)
     add_executable(spm WIN32 ${SOURCES} ${IMGUI_SOURCES})
